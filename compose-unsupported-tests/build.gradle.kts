@@ -52,7 +52,7 @@ dependencies {
   androidTestImplementation(libs.appCompat)
   androidTestImplementation(libs.compose.old.activity)
   androidTestImplementation(libs.compose.old.material)
-  androidTestImplementation(libs.compose.old.testing)
+  androidTestImplementation(libs.compose.testing)
   androidTestImplementation(libs.test.androidx.rules)
   androidTestImplementation(libs.test.junit)
   androidTestImplementation(libs.test.androidx.runner)
