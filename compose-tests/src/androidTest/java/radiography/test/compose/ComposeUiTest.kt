@@ -614,7 +614,7 @@ class ComposeUiTest {
       """
       |Box:
       |${BLANK}Box { test-tag:"parent" }
-      |${BLANK}╰─LazyColumn { vertical-scroll-axis-range:"ScrollAxisRange(value=0.0, maxValue=0.0)", test-tag:"list" }
+      |${BLANK}╰─LazyColumn { test-tag:"list", vertical-scroll-axis-range:"ScrollAxisRange(value=0.0, maxValue=0.0)" }
       |${BLANK}  ├─<subcomposition of LazyColumn>
       |${BLANK}  │ ╰─SkippableItem { test-tag:"child:1" }
       |${BLANK}  ├─<subcomposition of LazyColumn>

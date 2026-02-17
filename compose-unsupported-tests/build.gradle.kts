@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-  compileSdk = 34
+  compileSdk = 35
 
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -14,8 +14,8 @@ android {
   }
 
   defaultConfig {
-    minSdk = 21
-    targetSdk = 34
+    minSdk = 23
+    targetSdk = 35
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
 
@@ -52,7 +52,7 @@ dependencies {
   androidTestImplementation(libs.appCompat)
   androidTestImplementation(libs.compose.old.activity)
   androidTestImplementation(libs.compose.old.material)
-  androidTestImplementation(libs.compose.old.testing)
+  androidTestImplementation(libs.compose.testing)
   androidTestImplementation(libs.test.androidx.rules)
   androidTestImplementation(libs.test.junit)
   androidTestImplementation(libs.test.androidx.runner)

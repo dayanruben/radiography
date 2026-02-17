@@ -75,6 +75,7 @@ public object ViewStateRenderers {
         // Technically there can be multiple semantic modifiers on a single node, so read them
         // all.
         .flatten()
+        .sortedBy { it.key.name }
         .forEach { (key, value) ->
           when (key) {
             SemanticsProperties.TestTag -> appendLabeledValue("test-tag", value)
@@ -82,6 +83,7 @@ public object ViewStateRenderers {
               "content-description",
               (value as List<*>).map { "\"$it\"" }
             )
+
             SemanticsProperties.StateDescription -> appendLabeledValue("state-description", value)
             SemanticsProperties.Disabled -> append("DISABLED")
             SemanticsProperties.Focused -> if (value == true) append("FOCUSED")
@@ -89,6 +91,7 @@ public object ViewStateRenderers {
             SemanticsProperties.IsPopup -> append("POPUP")
             SemanticsProperties.ProgressBarRangeInfo ->
               appendLabeledValue("progress-bar-range", value)
+
             SemanticsProperties.PaneTitle -> appendLabeledValue("pane-title", value)
             SemanticsProperties.SelectableGroup -> append("SELECTABLE-GROUP")
             SemanticsProperties.Heading -> append("HEADING")
@@ -98,11 +101,13 @@ public object ViewStateRenderers {
                 "horizontal-scroll-axis-range",
                 scrollAxisRangeToString(value as? ScrollAxisRange)
               )
+
             SemanticsProperties.VerticalScrollAxisRange ->
               appendLabeledValue(
                 "vertical-scroll-axis-range",
                 scrollAxisRangeToString(value as? ScrollAxisRange)
               )
+
             SemanticsProperties.Role -> appendLabeledValue("role", value)
             SemanticsProperties.TextSelectionRange -> append("SELECTED-TEXT")
             SemanticsProperties.ImeAction -> appendLabeledValue("ime-action", value)
@@ -244,7 +249,8 @@ public object ViewStateRenderers {
    */
   // This function is only visible to Java consumers of this library.
   @JvmStatic
-  @PublishedApi internal fun <T : Any> androidViewStateRendererFor(
+  @PublishedApi
+  internal fun <T : Any> androidViewStateRendererFor(
     renderedClass: Class<T>,
     renderer: AttributeAppendable.(T) -> Unit
   ): ViewStateRenderer = ViewStateRenderer { scannableView ->

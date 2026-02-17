@@ -13,6 +13,8 @@ private val REFLECTION_CONSTANTS by lazy(PUBLICATION) {
         Class.forName("androidx.compose.runtime.ComposerImpl\$CompositionContextHolder")
       val CompositionContextImplClass =
         Class.forName("androidx.compose.runtime.ComposerImpl\$CompositionContextImpl")
+      val ReusableRememberObserverHolderClass =
+        Class.forName("androidx.compose.runtime.ReusableRememberObserverHolder")
       val CompositionContextHolderRefField =
         CompositionContextHolderClass.getDeclaredField("ref")
           .apply { isAccessible = true }
@@ -29,8 +31,13 @@ private val REFLECTION_CONSTANTS by lazy(PUBLICATION) {
 internal fun Group.getCompositionContexts(): Sequence<CompositionContext> {
   return REFLECTION_CONSTANTS?.run {
     data.asSequence()
-      .filter { it != null && it::class.java == CompositionContextHolderClass }
-      .mapNotNull { holder -> holder.tryGetCompositionContext() }
+      .filter { it != null && it::class.java == ReusableRememberObserverHolderClass }
+      .mapNotNull { holder ->
+        holder
+          ?.let { holder::class.java.getMethod("getWrapped") }
+          ?.invoke(holder)
+          ?.tryGetCompositionContext()
+      }
   } ?: emptySequence()
 }
 
