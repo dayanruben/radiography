@@ -27,6 +27,7 @@ import androidx.compose.ui.semantics.SemanticsProperties.ContentDescription
 import androidx.compose.ui.semantics.SemanticsProperties.Disabled
 import androidx.compose.ui.semantics.SemanticsProperties.Focused
 import androidx.compose.ui.semantics.SemanticsProperties.Heading
+import androidx.compose.ui.semantics.SemanticsProperties.HideFromAccessibility
 import androidx.compose.ui.semantics.SemanticsProperties.HorizontalScrollAxisRange
 import androidx.compose.ui.semantics.SemanticsProperties.ImeAction
 import androidx.compose.ui.semantics.SemanticsProperties.InvisibleToUser
@@ -131,14 +132,13 @@ class ComposeUiTest {
       Box(Modifier.semantics { set(Disabled, Unit) })
       Box(Modifier.semantics { set(Focused, true) })
       Box(Modifier.semantics { set(Focused, false) })
-      Box(Modifier.semantics { set(InvisibleToUser, Unit) })
+      Box(Modifier.semantics { set(HideFromAccessibility, Unit) })
       Box(Modifier.semantics { set(IsDialog, Unit) })
       Box(Modifier.semantics { set(IsPopup, Unit) })
       Box(Modifier.semantics { set(ProgressBarRangeInfo, ProgressBarRangeInfo(.2f, 0f..0.5f)) })
       Box(Modifier.semantics { set(PaneTitle, "pane title") })
       Box(Modifier.semantics { set(SelectableGroup, Unit) })
       Box(Modifier.semantics { set(Heading, Unit) })
-      Box(Modifier.semantics { set(InvisibleToUser, Unit) })
       Box(Modifier.semantics {
         set(
           HorizontalScrollAxisRange,
@@ -184,6 +184,24 @@ class ComposeUiTest {
     assertThat(hierarchy).contains("Box { SELECTED }")
     assertThat(hierarchy).contains("Box { toggle-state:On }")
     assertThat(hierarchy).contains("Box { PASSWORD }")
+  }
+
+  /**
+   * Copy of [semanticsAreReported] but for deprecated properties that are reported with the same
+   * tags as their replacements.
+   */
+  @Suppress("DEPRECATION")
+  @OptIn(ExperimentalComposeUiApi::class)
+  @Test fun deprecatedSemanticsAreReported() {
+    composeRule.setContentWithExplicitRoot {
+      Box(Modifier.semantics { set(InvisibleToUser, Unit) })
+    }
+
+    val hierarchy = composeRule.runOnIdle {
+      Radiography.scan()
+    }
+
+    assertThat(hierarchy).contains("Box { INVISIBLE-TO-USER }")
   }
 
   @Test fun checkableChecked() {

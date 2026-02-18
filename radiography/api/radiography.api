@@ -200,6 +200,11 @@ public final class radiography/internal/SemanticsKt {
 	public static final fun findTestTags (Lradiography/ScannableView$ComposeView;)Lkotlin/sequences/Sequence;
 }
 
+public final class radiography/internal/SemanticsPropertiesHelpers {
+	public static final field INSTANCE Lradiography/internal/SemanticsPropertiesHelpers;
+	public final fun getHideFromAccessibility ()Landroidx/compose/ui/semantics/SemanticsPropertyKey;
+}
+
 public final class radiography/internal/StringsKt {
 	public static final fun ellipsize (Ljava/lang/CharSequence;I)Ljava/lang/CharSequence;
 	public static final fun formatPixelDimensions (II)Ljava/lang/String;

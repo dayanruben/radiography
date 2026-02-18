@@ -98,7 +98,7 @@ public object Radiography {
     } catch (e: Throwable) {
       insert(
         startPosition,
-        "Exception when going through view hierarchy: ${e.message}\n"
+        "Exception when going through view hierarchy:\n" + e.stackTraceToString()
       )
     }
   }
