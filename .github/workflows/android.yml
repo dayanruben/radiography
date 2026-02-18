@@ -8,19 +8,20 @@ jobs:
   build:
     strategy:
       fail-fast: false
-    runs-on : workflow-kotlin-test-runner-ubuntu-4core
+    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+    - uses: actions/checkout@v4
     - name: set up JDK 17
-      uses: actions/setup-java@v1
+      uses: actions/setup-java@v4
       with:
+        distribution: zulu
         java-version: 17
     - name: Build with Gradle
       run: ./gradlew build
 
   instrumentation-tests:
     name: Instrumentation tests
-    runs-on : workflow-kotlin-test-runner-ubuntu-4core
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
       # Allow tests to continue on other devices if they fail on one device.
@@ -42,10 +43,11 @@ jobs:
             sudo udevadm control --reload-rules
             sudo udevadm trigger --name-match=kvm
 
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: actions/checkout@v4
       - name: Set up JDK 17
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v4
         with:
+          distribution: zulu
           java-version: 17
 
       - name: Instrumentation Tests
@@ -58,7 +60,7 @@ jobs:
 
       - name: Upload results
         if: ${{ always() }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: instrumentation-test-results ${{ matrix.api-level }}
           path: ./**/build/reports/androidTests/connected/**
