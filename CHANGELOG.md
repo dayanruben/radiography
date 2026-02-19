@@ -2,6 +2,17 @@ Change Log
 ==========
 
 
+Version 2.8
+-----------
+
+_2026-02-19_
+
+* Upgrade Compose to 1.10.1 ([#184](https://github.com/square/radiography/pull/184)).
+* Bump `minSdk` to 23 and `compileSdk`/`targetSdk` to 35 ([#184](https://github.com/square/radiography/pull/184)).
+* Add `topLeft` bounds to `ScannableView.ComposeView` ([#175](https://github.com/square/radiography/pull/175)).
+* Handle deprecated `InvisibleToUser` semantics property ([#185](https://github.com/square/radiography/pull/185)).
+* Sort `SemanticsProperties` printing to ensure consistent ordering ([#184](https://github.com/square/radiography/pull/184)).
+* Upgrade Gradle, AGP, and migrate to version catalogs ([#177](https://github.com/square/radiography/pull/177), [#179](https://github.com/square/radiography/pull/179), [#189](https://github.com/square/radiography/pull/189)).
 
 Version 2.7
 -----------
