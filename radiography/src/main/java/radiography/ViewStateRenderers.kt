@@ -14,6 +14,7 @@ import androidx.compose.ui.semantics.SemanticsProperties.Text
 import androidx.compose.ui.semantics.getOrNull
 import radiography.ScannableView.AndroidView
 import radiography.ScannableView.ComposeView
+import radiography.internal.SemanticsPropertiesHelpers
 import radiography.internal.ellipsize
 import radiography.internal.formatPixelDimensions
 import radiography.internal.isComposeAvailable
@@ -77,6 +78,7 @@ public object ViewStateRenderers {
         .flatten()
         .sortedBy { it.key.name }
         .forEach { (key, value) ->
+          @Suppress("DEPRECATION")
           when (key) {
             SemanticsProperties.TestTag -> appendLabeledValue("test-tag", value)
             SemanticsProperties.ContentDescription -> appendLabeledValue(
@@ -95,7 +97,8 @@ public object ViewStateRenderers {
             SemanticsProperties.PaneTitle -> appendLabeledValue("pane-title", value)
             SemanticsProperties.SelectableGroup -> append("SELECTABLE-GROUP")
             SemanticsProperties.Heading -> append("HEADING")
-            SemanticsProperties.InvisibleToUser -> append("INVISIBLE-TO-USER")
+            SemanticsProperties.InvisibleToUser, // InvisibleToUser is deprecated.
+            SemanticsPropertiesHelpers.HideFromAccessibility -> append("INVISIBLE-TO-USER")
             SemanticsProperties.HorizontalScrollAxisRange ->
               appendLabeledValue(
                 "horizontal-scroll-axis-range",
