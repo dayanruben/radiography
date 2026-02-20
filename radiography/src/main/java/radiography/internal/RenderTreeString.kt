@@ -30,7 +30,8 @@ private fun <N> renderRecursively(
 
   nodeDescription.lineSequence().forEachIndexed { index, line ->
     builder.appendLinePrefix(depth, continuePreviousLine = index > 0, lastChildMask = lastChildMask)
-    builder.appendLine(line)
+    @Suppress("DEPRECATION")
+    (builder.appendln(line))
   }
 
   val lastChildIndex = children.size - 1

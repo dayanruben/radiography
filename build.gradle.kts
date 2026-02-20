@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 import com.vanniktech.maven.publish.AndroidSingleVariantLibrary
-import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import kotlinx.validation.ApiValidationExtension
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
@@ -37,7 +35,6 @@ buildscript {
     classpath(libs.build.android)
     classpath(libs.build.mavenPublish)
     classpath(libs.build.kotlin)
-    classpath(libs.build.compose.compiler)
     classpath(libs.build.ktlint)
     classpath(libs.build.binaryCompatibility)
     // Required for the gradle-maven-publish-plugin plugin.
@@ -82,7 +79,6 @@ subprojects {
       signAllPublications()
       pomFromGradleProperties()
 
-      @Suppress("DEPRECATION")
       configure(
         AndroidSingleVariantLibrary(variant = "release", sourcesJar = true, publishJavadocJar = true),
       )
@@ -90,13 +86,13 @@ subprojects {
   }
 
   tasks.withType<KotlinCompile> {
-    compilerOptions {
+    kotlinOptions {
       // Allow warnings when running from IDE, makes it easier to experiment.
       if (!isRunningFromIde) {
-        allWarningsAsErrors.set(true)
+        allWarningsAsErrors = true
       }
 
-      jvmTarget.set(JvmTarget.JVM_1_8)
+      jvmTarget = "1.8"
     }
   }
 
@@ -112,7 +108,6 @@ subprojects {
       reporter(ReporterType.JSON)
     }
 
-    @Suppress("DEPRECATION")
     disabledRules.set(
       setOf(
         // IntelliJ refuses to sort imports correctly.
