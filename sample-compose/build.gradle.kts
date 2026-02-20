@@ -1,8 +1,10 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
   id("com.android.application")
   kotlin("android")
+  id("org.jetbrains.kotlin.plugin.compose")
 }
 
 android {
@@ -24,10 +26,6 @@ android {
     compose = true
   }
 
-  composeOptions {
-    kotlinCompilerExtensionVersion = libs.versions.compose.sample.compiler.get()
-  }
-
   packaging {
     resources.excludes += listOf(
       "META-INF/AL2.0",
@@ -39,10 +37,10 @@ android {
 }
 
 tasks.withType<KotlinCompile> {
-  kotlinOptions {
-    jvmTarget = "1.8"
-    freeCompilerArgs += listOf(
-      "-Xopt-in=kotlin.RequiresOptIn"
+  compilerOptions {
+    jvmTarget.set(JvmTarget.JVM_1_8)
+    freeCompilerArgs.addAll(
+      "-opt-in=kotlin.RequiresOptIn"
     )
   }
 }
