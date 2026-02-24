@@ -55,6 +55,7 @@ apply(plugin = "binary-compatibility-validator")
 
 extensions.configure<ApiValidationExtension> {
   // Ignore all sample projects, since they're not part of our API.
+  // stoic-plugin builds a plugin to use with stoic - it's also not part of our API.
   // Only leaf project name is valid configuration, and every project must be individually ignored.
   // See https://github.com/Kotlin/binary-compatibility-validator/issues/3
   ignoredProjects = mutableSetOf(
@@ -62,6 +63,7 @@ extensions.configure<ApiValidationExtension> {
     "compose-unsupported-tests",
     "sample",
     "sample-compose",
+    "stoic-plugin",
   )
 }
 
