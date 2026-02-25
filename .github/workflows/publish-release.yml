@@ -3,10 +3,16 @@ name: Publish Release
 on:
   workflow_dispatch:
 
+permissions:
+  # Required so GH_TOKEN can create the GitHub Release and upload the artifact.
+  contents: write
+
 jobs:
-  publish-release:
+  # This job is the irreversible boundary. Once Maven Central publish succeeds,
+  # we do not want retries for downstream GitHub operations to re-run it.
+  build-and-publish-to-maven:
     runs-on: macos-latest
-    if: github.repository == 'block/radiography'
+    if: github.repository == 'block/radiography' && startsWith(github.ref, 'refs/tags/v')
     timeout-minutes: 35
 
     steps:
@@ -23,10 +29,81 @@ jobs:
       - name: Assemble
         run: ./gradlew assemble
 
-      - name: Publish Release
+      # Build and hand off the release asset in the same build context as Maven
+      # publish, so the release uses artifacts from the same pipeline run.
+      - name: Build Stoic Plugin Distribution
+        run: ./gradlew :stoic-plugin:dist
+
+      - name: Upload Stoic Plugin Distribution
+        uses: actions/upload-artifact@v4
+        with:
+          # Include tag + commit to avoid any ambiguity about which artifact this is.
+          name: stoic-plugin-dist-${{ github.ref_name }}-${{ github.sha }}
+          path: stoic-plugin/build/distributions/radiography-stoic-plugin-*.tar.gz
+          if-no-files-found: error
+          # Keep the upload for 7 days so we have time to retry publishing the
+          # Github release
+          retention-days: 7
+
+      # Maven publish must be the final step in this job because it's
+      # irreversible: if we attempt to republish it will fail.
+      - name: Publish To Maven
         run: ./gradlew publish
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_CENTRAL_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_CENTRAL_PASSWORD }}
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_SECRET_KEY }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_SECRET_PASSPHRASE }}
+
+  # Keep release publication in a separate job so "Re-run failed jobs" can retry
+  # GitHub release operations without re-running Maven publish.
+  publish-to-github-release:
+    runs-on: ubuntu-latest
+    needs: build-and-publish-to-maven
+    timeout-minutes: 10
+
+    steps:
+      - name: Download Stoic Plugin Distribution
+        uses: actions/download-artifact@v4
+        with:
+          # Download the exact artifact produced by build-and-publish-to-maven.
+          name: stoic-plugin-dist-${{ github.ref_name }}-${{ github.sha }}
+          path: dist
+
+      - name: Create Draft GitHub Release, Upload Asset, and Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          artifact_path="$(ls dist/radiography-stoic-plugin-*.tar.gz)"
+          release_notes='See [Change Log](https://github.com/square/radiography/blob/main/CHANGELOG.md)'
+
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            # We only auto-recover if the existing release is still a draft.
+            # A published immutable release may reject asset modifications.
+            is_draft="$(gh release view "$GITHUB_REF_NAME" --json isDraft --jq .isDraft)"
+            if [ "$is_draft" != "true" ]; then
+              echo "Release $GITHUB_REF_NAME is already published and cannot be safely finalized as draft-first."
+              echo "If immutable releases are enabled, published release assets cannot be modified:"
+              echo "https://docs.github.com/en/code-security/concepts/supply-chain-security/immutable-releases"
+              exit 1
+            fi
+          else
+            gh release create "$GITHUB_REF_NAME" \
+              --draft \
+              --title "$GITHUB_REF_NAME" \
+              --notes "$release_notes"
+          fi
+
+          # Draft-first follows GitHub immutable release guidance:
+          # https://docs.github.com/en/code-security/concepts/supply-chain-security/immutable-releases
+          # --clobber makes retries idempotent if an earlier attempt uploaded assets.
+          gh release upload "$GITHUB_REF_NAME" "$artifact_path" --clobber
+
+          # Publish only after assets are uploaded to avoid partially published
+          # immutable releases missing artifacts.
+          gh release edit "$GITHUB_REF_NAME" \
+            --draft=false \
+            --title "$GITHUB_REF_NAME" \
+            --notes "$release_notes"
