@@ -27,7 +27,6 @@ git commit -am "Prepare {NEW_VERSION} release" && \
 ./gradlew clean && \
 ./gradlew build && \
 ./gradlew connectedCheck && \
-./gradlew :stoic-plugin:dist && \
 git tag v{NEW_VERSION} && \
 git push origin v{NEW_VERSION} && \
 gh workflow run publish-release.yml --ref v{NEW_VERSION} && \
@@ -37,8 +36,7 @@ git pull && \
 git merge --no-ff --no-edit release_{NEW_VERSION} && \
 sed -i '' 's/VERSION_NAME={NEW_VERSION}/VERSION_NAME={NEXT_VERSION}-SNAPSHOT/' gradle.properties && \
 git commit -am "Prepare for next development iteration" && \
-git push && \
-gh release create v{NEW_VERSION} --title v{NEW_VERSION} --notes 'See [Change Log](https://github.com/square/radiography/blob/main/CHANGELOG.md)' stoic-plugin/build/distributions/radiography-stoic-plugin-{NEW_VERSION}.tar.gz
+git push
 ```
 
 * Wait for the release to be available [on Maven Central](https://repo1.maven.org/maven2/com/squareup/radiography/radiography/).
