@@ -6,7 +6,16 @@
 
 set -e
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Homebrew invokes this via a symlink in /opt/homebrew/bin, so resolve the
+# real script path before locating the bundled plugin APK next to this script.
+SOURCE="${BASH_SOURCE[0]}"
+while [ -L "$SOURCE" ]; do
+    SOURCE_DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
+    SOURCE="$(readlink "$SOURCE")"
+    [[ "$SOURCE" != /* ]] && SOURCE="${SOURCE_DIR}/${SOURCE}"
+done
+
+SCRIPT_DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
 PLUGIN_APK="${SCRIPT_DIR}/stoic-plugin-debug.apk"
 
 # Check if stoic is installed
