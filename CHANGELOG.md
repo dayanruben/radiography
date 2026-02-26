@@ -2,6 +2,15 @@ Change Log
 ==========
 
 
+Version 2.9
+-----------
+
+_2026-02-25_
+
+* Upgrade Kotlin to 2.3.10 ([#190](https://github.com/square/radiography/pull/190)).
+* Introduce radiography command-line tool ([#180](https://github.com/square/radiography/pull/180)).
+* Release stoic-plugin via workflow ([#191](https://github.com/square/radiography/pull/191)).
+
 Version 2.8
 -----------
 
